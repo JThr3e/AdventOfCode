@@ -4,7 +4,7 @@ def is_digit(x : String):
 
 def main():
     var f = open("input", "r")
-    var ipt = f.read()
+    let ipt = f.read()
     var first : String = ""
     var last : String = ""
     var calib_sum : Int = 0 

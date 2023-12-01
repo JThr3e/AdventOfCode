@@ -1,6 +1,6 @@
 
 def get_num_or_empty(idx: Int, ipt: String) -> String:
-    var nums = VariadicList("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
+    let nums = VariadicList("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine")
     if ord(ipt[idx]) >= 48 and ord(ipt[idx]) <= 57:
         return ipt[idx]
     else:
@@ -11,7 +11,7 @@ def get_num_or_empty(idx: Int, ipt: String) -> String:
 
 def main():
     var f = open("input", "r")
-    var ipt = f.read()
+    let ipt = f.read()
     var first : String = ""
     var last : String = ""
     var calib_sum : Int = 0 
