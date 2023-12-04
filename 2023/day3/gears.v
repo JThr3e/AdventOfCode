@@ -1,11 +1,93 @@
-module is_gear(part_val, is_gear);
+
+module calc_gear_val_lhs(num0, num1, num2, valid, value);
   parameter WIDTH = 8;
-  input [WIDTH-1: 0] part_val;
-  output is_gear;
-  assign is_gear = part_val == 8'h2A;
+  input [WIDTH-1:0] num0, num1, num2;
+  output valid;
+  output [31:0] value;
+  wire valid_3, valid_2, valid_1;
+  wire [31:0] value_3, value_2, value_1;
+  // valid if it sees [ddd]
+  assign valid_3 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  // valid if it sees [.dd]
+  assign valid_2 = (~((num0 >= 8'h30) & (num0 <= 8'h39))) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  // valid if it sees [..d]
+  assign valid_1 = (~((num0 >= 8'h30) & (num0 <= 8'h39))) & (~((num1 >= 8'h30) & (num1 <= 8'h39))) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  assign value_1 = (num2-8'h30);
+  assign value_2 = ((num1-8'h30)*10) + value_1;
+  assign value_3 = ((num0-8'h30)*100) + value_2;
+  assign value = valid_3 ? value_3 : (valid_2 ? value_2 : (valid_1 ? value_1 : 1));
+  assign valid = valid_1 | valid_2 | valid_3;
 endmodule
 
-module gondola(clk, reset, counter, part_val, is_digit, side_valid, part_of_part_num, part_sum);
+module calc_gear_val_lhs_lite(num0, num1, num2, valid, value);
+  parameter WIDTH = 8;
+  input [WIDTH-1:0] num0, num1, num2;
+  output valid;
+  output [31:0] value;
+  wire valid_3, valid_2, valid_1;
+  wire [31:0] value_3, value_2, value_1;
+  // valid if it sees [ddd]
+  assign valid_3 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  assign value_1 = (num2-8'h30);
+  assign value_2 = ((num1-8'h30)*10) + value_1;
+  assign value_3 = ((num0-8'h30)*100) + value_2;
+  assign value = valid_3 ? value_3 : 1;
+  assign valid = valid_3;
+endmodule
+
+module calc_gear_val_rhs(num0, num1, num2, valid, value);
+  parameter WIDTH = 8;
+  input [WIDTH-1:0] num0, num1, num2;
+  output valid;
+  output [31:0] value;
+  wire valid_3, valid_2, valid_1;
+  wire [31:0] value_3, value_2, value_1;
+  // valid if it sees [ddd]
+  assign valid_3 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  // valid if it sees [dd.]
+  assign valid_2 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (~((num2 >= 8'h30) & (num2 <= 8'h39)));
+  // valid if it sees [d..]
+  assign valid_1 = (num0 >= 8'h30) & (num0 <= 8'h39) & (~((num1 >= 8'h30) & (num1 <= 8'h39))) & (~((num2 >= 8'h30) & (num2 <= 8'h39)));
+  assign value_1 = (num0-8'h30);
+  assign value_2 = ((num0-8'h30)*10) + (num1-8'h30);
+  assign value_3 = ((num0-8'h30)*100) + ((num1-8'h30)*10) + (num2-8'h30);
+  assign value = valid_3 ? value_3 : (valid_2 ? value_2 : (valid_1 ? value_1 : 1));
+  assign valid = valid_1 | valid_2 | valid_3;
+endmodule
+
+module calc_gear_val_rhs_lite(num0, num1, num2, valid, value);
+  parameter WIDTH = 8;
+  input [WIDTH-1:0] num0, num1, num2;
+  output valid;
+  output [31:0] value;
+  wire valid_3, valid_2, valid_1;
+  wire [31:0] value_3, value_2, value_1;
+  // valid if it sees [ddd]
+  assign valid_3 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  assign value_3 = ((num0-8'h30)*100) + ((num1-8'h30)*10) + (num2-8'h30);
+  assign value = valid_3 ? value_3 : 1;
+  assign valid = valid_3;
+endmodule
+
+module calc_gear_val_mid(num0, num1, num2, valid, value);
+  parameter WIDTH = 8;
+  input [WIDTH-1:0] num0, num1, num2;
+  output valid;
+  output [31:0] value;
+  wire valid_3, valid_1;
+  wire [31:0] value_3, value_1;
+  // valid if it sees [ddd]
+  assign valid_3 = (num0 >= 8'h30) & (num0 <= 8'h39) & (num1 >= 8'h30) & (num1 <= 8'h39) & (num2 >= 8'h30) & (num2 <= 8'h39);
+  // valid if it sees [.d.]
+  assign valid_1 = (~((num0 >= 8'h30) & (num0 <= 8'h39))) & (num1 >= 8'h30) & (num1 <= 8'h39) & (~((num2 >= 8'h30) & (num2 <= 8'h39)));
+  assign value_1 = (num1-8'h30);
+  assign value_3 = ((num0-8'h30)*100) + ((num1-8'h30)*10) + (num2-8'h30);
+  assign value = valid_3 ? value_3 : (valid_1 ? value_1 : 1);
+  assign valid = valid_1 | valid_3;
+endmodule
+
+
+module gears(clk, reset, counter, part_val, valid, prod_val_sum, test);
 
   parameter WIDTH = 8;
   parameter IPT_SIZE = 19599;
@@ -15,123 +97,112 @@ module gondola(clk, reset, counter, part_val, is_digit, side_valid, part_of_part
   input 	       clk, reset;
   output [WIDTH-1: 0] part_val;
   output [7:0] state;
-  output is_digit, side_valid, part_of_part_num, top_valid, bot_valid;
-  output [31:0] counter;
-  output [31:0] part_sum;
+  output [31:0] counter, test;
+  output [63:0] prod_val_sum;
+  output valid;
 
   reg [31: 0]   counter;
-  reg [31: 0]   part_sum;
-  reg [7:0]     state;
 
-  wire 	       clk, reset, is_digit;
+  wire 	       clk, reset;
 
   reg [WIDTH-1:0] mem[IPT_SIZE:0];
   initial begin
      $readmemb("input.bin",mem);
   end
 
-  assign part_val = mem[counter];
-  assign is_digit = (part_val >= 8'h30) & (part_val <= 8'h39);
-  assign side_valid = (counter%IPT_ROW_SIZE > 0) & (counter%IPT_ROW_SIZE < (IPT_ROW_SIZE-1));
-  assign top_valid = counter > IPT_ROW_SIZE;
-  assign bot_valid = (counter < IPT_ROW_SIZE*(IPT_COL_SIZE-1));
-  
-  wire left,right,top,top_left,top_right,bot,bot_left,bot_right;
-  // Gonna just use an obscene number of read ports ~becasue i can~
-  is_gear left_sym(mem[counter-1], left);
-  is_gear right_sym(mem[counter+1], right);
-  is_gear top_sym(mem[counter-IPT_ROW_SIZE], top);
-  is_gear top_left_sym(mem[counter-IPT_ROW_SIZE-1], top_left);
-  is_gear top_right_sym(mem[counter-IPT_ROW_SIZE+1], top_right);
-  is_gear bot_sym(mem[counter+IPT_ROW_SIZE], bot);
-  is_gear bot_left_sym(mem[counter+IPT_ROW_SIZE-1], bot_left);
-  is_gear bot_right_sym(mem[counter+IPT_ROW_SIZE+1], bot_right);
-
-  wire top_is_sym, bot_is_sym;
-  assign top_is_sym = top_valid & (top|top_left|top_right);
-  assign bot_is_sym = bot_valid & (bot|bot_left|bot_right);
-  assign part_of_part_num = side_valid & (left|right|top_is_sym|bot_is_sym);
-
-  reg [WIDTH-1: 0]  num0;
-  reg [WIDTH-1: 0]  num1;
-  reg [WIDTH-1: 0]  num2;
-  reg part_num_detected;
-  // State Machine Next State Logic
-  parameter detect_one=0, detect_two=1, detect_three=2, compute_one=3, compute_two=4, compute_three=5;
+  reg [63:0] prod_val_sum;
   always @(posedge clk or posedge reset)
-    if (reset)
+      if(reset)
       begin
-      state <= 0;
-      counter <= 0;
-      part_sum <= 0;
+	      counter <= 0;
+              prod_val_sum <= 0;
       end
-    else if (counter < IPT_SIZE)
-      case (state)
-	  detect_one:
-	      if (~is_digit)
-		begin
-	        state <= detect_one;
-	        counter <= counter + 1;
-	        end
-	      else
-		begin 
-	        state <= detect_two;
-	        counter <= counter + 1;
-		num0 <= part_val-8'h30;
-	        part_num_detected <= part_num_detected | part_of_part_num;
-	        end
-	  detect_two:
-	      if (~is_digit)
-		begin
-		state <= compute_one;
-	        counter <= counter + 1;
-	        end
-	      else
-		begin
-		state <= detect_three;
-                counter <= counter + 1;
-		num1 <= part_val-8'h30;
-	        part_num_detected <= part_num_detected | part_of_part_num;
-		end
-          detect_three:
-	      if (~is_digit)
-		begin
-		state <= compute_two;
-	        counter <= counter + 1;
-	        end
-	      else
-		begin
-		state <= compute_three;
-                counter <= counter + 1;
-		num2 <= part_val-8'h30;
-	        part_num_detected <= part_num_detected | part_of_part_num;
-	        end
-	  compute_one:
-	      begin
-	      state <= detect_one;
-	      part_num_detected <= 0;
-	      if (part_num_detected)
-	        part_sum <= part_sum + num0;
-              end
-          compute_two:
-	      begin
-	      state <= detect_one;
-	      part_num_detected <= 0;
-	      if (part_num_detected)
-	        part_sum <= part_sum + (10*num0) + num1;
-              end
-          compute_three:
-	      begin
-              part_num_detected <= 0;
-	      state <= detect_one;
-	      if (part_num_detected)
-	        part_sum <= part_sum + (100*num0) + (10*num1) + num2;	        	
-	      end
-	endcase
-    else
+      else if (counter < IPT_SIZE)
       begin
-      counter <= counter;
-      state <= state;
+	      counter <= counter+1;
+	      if(valid)
+		      prod_val_sum <= prod_val_sum + prod_vals;
+      end      
+      else 
+      begin
+	      counter <= counter;
+	      prod_val_sum <= prod_val_sum;
       end
 
-endmodule 
+  assign part_val = mem[counter];
+  assign is_gear = part_val == 8'h2A;
+  
+  wire [31:0] gear_values [11:0];
+  wire gear_valids [11:0];
+  wire [7:0] sum_valids;
+  wire [63:0] prod_vals;
+
+  // If this was real HW would probably read from mem over many clk cycles
+  // instead of using many many read ports
+  calc_gear_val_lhs u0(mem[counter-IPT_ROW_SIZE-3], mem[counter-IPT_ROW_SIZE-2], mem[counter-IPT_ROW_SIZE-1], gear_valids[0], gear_values[0]);
+  calc_gear_val_lhs_lite u1(mem[counter-IPT_ROW_SIZE-2], mem[counter-IPT_ROW_SIZE-1], mem[counter-IPT_ROW_SIZE], gear_valids[1], gear_values[1]);
+  calc_gear_val_mid u2(mem[counter-IPT_ROW_SIZE-1], mem[counter-IPT_ROW_SIZE], mem[counter-IPT_ROW_SIZE+1], gear_valids[2], gear_values[2]);
+  calc_gear_val_rhs u3(mem[counter-IPT_ROW_SIZE+1], mem[counter-IPT_ROW_SIZE+2], mem[counter-IPT_ROW_SIZE+3], gear_valids[3], gear_values[3]);
+  calc_gear_val_rhs_lite u4(mem[counter-IPT_ROW_SIZE], mem[counter-IPT_ROW_SIZE+1], mem[counter-IPT_ROW_SIZE+2], gear_valids[4], gear_values[4]);
+  calc_gear_val_lhs u5(mem[counter-3], mem[counter-2], mem[counter-1], gear_valids[5], gear_values[5]);
+  calc_gear_val_rhs u6(mem[counter+1], mem[counter+2], mem[counter+1], gear_valids[6], gear_values[6]);
+  calc_gear_val_lhs u7(mem[counter+IPT_ROW_SIZE-3], mem[counter+IPT_ROW_SIZE-2], mem[counter+IPT_ROW_SIZE-1], gear_valids[7], gear_values[7]);
+  calc_gear_val_lhs_lite u8(mem[counter+IPT_ROW_SIZE-2], mem[counter+IPT_ROW_SIZE-1], mem[counter+IPT_ROW_SIZE], gear_valids[8], gear_values[8]);
+  calc_gear_val_mid u9(mem[counter+IPT_ROW_SIZE-1], mem[counter+IPT_ROW_SIZE], mem[counter+IPT_ROW_SIZE+1], gear_valids[9], gear_values[9]);
+  calc_gear_val_rhs u10(mem[counter+IPT_ROW_SIZE+1], mem[counter+IPT_ROW_SIZE+2], mem[counter+IPT_ROW_SIZE+3], gear_valids[10], gear_values[10]);
+  calc_gear_val_rhs_lite u11(mem[counter+IPT_ROW_SIZE], mem[counter+IPT_ROW_SIZE+1], mem[counter+IPT_ROW_SIZE+2], gear_valids[11], gear_values[11]);
+
+  //genvar i;
+  //generate
+  //  for (i = 0; i < 5; i=i+1) begin
+  //  end
+  //endgenerate
+  //calc_gear_val u1(mem[counter-3], mem[counter-2], mem[counter-1], gear_valids[5], gear_values[5]);
+  //calc_gear_val u2(mem[counter+1], mem[counter+2], mem[counter+3], gear_valids[6], gear_values[6]);
+  //generate
+  //  for (i = 0; i < 5; i=i+1) begin
+  //      calc_gear_val u3(mem[counter+IPT_ROW_SIZE-3+i], mem[counter+IPT_ROW_SIZE-2+i], mem[counter+IPT_ROW_SIZE-1+i], gear_valids[i+7], gear_values[i+7]);
+  //  end
+  //endgenerate
+  //
+  wire [31:0] gear_values_adj [11:0]; 
+  assign gear_values_adj[0] = (~gear_valids[1]) ? gear_values[0] : 1;
+  assign gear_values_adj[1] = gear_values[1];
+  assign gear_values_adj[2] = gear_values[2];
+  assign gear_values_adj[3] = (~gear_valids[2]) ? gear_values[3] : 1;
+  assign gear_values_adj[4] = gear_values[4];
+  assign gear_values_adj[5] = gear_values[5];
+  assign gear_values_adj[6] = gear_values[6];
+  assign gear_values_adj[7] = (~gear_valids[8]) ? gear_values[7] : 1;
+  assign gear_values_adj[8] = gear_values[8];
+  assign gear_values_adj[9] = gear_values[9];
+  assign gear_values_adj[10] = (~gear_valids[11]) ? gear_values[10] : 1;
+  assign gear_values_adj[11] = gear_values[11];
+
+  wire gear_valids_adj [11:0];
+  assign gear_valids_adj[0] = (~gear_valids[1]) ? gear_valids[0] : 0;
+  assign gear_valids_adj[1] = gear_valids[1];
+  assign gear_valids_adj[2] = gear_valids[2];
+  assign gear_valids_adj[3] = (~gear_valids[2]) ? gear_valids[3] : 0;
+  assign gear_valids_adj[4] = gear_valids[4];
+  assign gear_valids_adj[5] = gear_valids[5];
+  assign gear_valids_adj[6] = gear_valids[6];
+  assign gear_valids_adj[7] = (~gear_valids[8]) ? gear_valids[7] : 0;
+  assign gear_valids_adj[8] = gear_valids[8];
+  assign gear_valids_adj[9] = gear_valids[9];
+  assign gear_valids_adj[10] = (~gear_valids[11]) ? gear_valids[10] : 0;
+  assign gear_valids_adj[11] = gear_valids[11];
+
+  assign sum_valids = gear_valids_adj[0]+gear_valids_adj[1]+gear_valids_adj[2]+gear_valids_adj[3]+gear_valids_adj[4]+gear_valids_adj[5]
+               +gear_valids_adj[6]+gear_valids_adj[7]+gear_valids_adj[8]+gear_valids_adj[9]+gear_valids_adj[10]+gear_valids_adj[11];
+  // If this was real HW would mux out the valid gear values and then mul them because
+  // otherwise this would be very wasteful
+  assign prod_vals = gear_values_adj[0]*gear_values_adj[1]*gear_values_adj[2]*gear_values_adj[3]*gear_values_adj[4]*gear_values_adj[5]
+               *gear_values_adj[6]*gear_values_adj[7]*gear_values_adj[8]*gear_values_adj[9]*gear_values_adj[10]*gear_values_adj[11];
+
+  //assign test = gear_values[4];
+  assign test = gear_values[10];
+
+  assign valid = (sum_valids == 2) & is_gear;
+
+  endmodule 
